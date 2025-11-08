@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Marathi Voice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #48dbfb;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #48dbfb;
+        }
+        button {
+            background: #48dbfb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0abde3;
+        }
+        .voice-list {
+            margin-top: 20px;
+        }
+        .voice-item {
+            background: #333;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #48dbfb;
+        }
+        .marathi {
+            border-left-color: #ff6b6b;
+            background: #3a2a2a;
+        }
+        .hindi {
+            border-left-color: #ffa502;
+            background: #3a3020;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #2a3a2a;
+        }
+        .error {
+            background: #3a2a2a;
+            color: #ff6b6b;
+        }
+        .success {
+            background: #2a3a2a;
+            color: #00d2d3;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            border: 1px solid #48dbfb;
+            color: #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Marathi Voice Test</h1>
+
+    <div class="section">
+        <h2>Step 1: Check Available Voices</h2>
+        <button onclick="listVoices()">List All Voices</button>
+        <div id="voiceCount" class="status"></div>
+        <div id="voiceList" class="voice-list"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 2: Test Marathi Voice</h2>
+        <p>Enter Marathi text to speak:</p>
+        <input type="text" id="marathiText" value="व्यायामाचे अनेक फायदे आहेत" placeholder="Enter Marathi text">
+        <br>
+        <button onclick="testMarathiVoice()">🔊 Speak in Marathi</button>
+        <button onclick="stopSpeech()">⏹️ Stop</button>
+        <div id="marathiStatus" class="status"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 3: Test Hindi Voice (Comparison)</h2>
+        <input type="text" id="hindiText" value="व्यायाम के कई फायदे हैं" placeholder="Enter Hindi text">
+        <br>
+        <button onclick="testHindiVoice()">🔊 Speak in Hindi</button>
+        <button onclick="stopSpeech()">⏹️ Stop</button>
+        <div id="hindiStatus" class="status"></div>
+    </div>
+
+    <div class="section">
+        <h2>Step 4: Install Marathi Voice (If Missing)</h2>
+        <div style="background: #3a2a2a; padding: 15px; border-radius: 5px;">
+            <h3>Windows 10/11 Installation:</h3>
+            <ol>
+                <li><strong>Open Settings</strong> (Win + I)</li>
+                <li>Go to <strong>Time & Language</strong></li>
+                <li>Click <strong>Language & Region</strong></li>
+                <li>Click <strong>Add a language</strong></li>
+                <li>Search for <strong>"Marathi"</strong></li>
+                <li>Select <strong>Marathi (India)</strong></li>
+                <li>Click <strong>Next</strong> → <strong>Install</strong></li>
+                <li>Wait for installation to complete</li>
+                <li><strong>Restart browser</strong></li>
+                <li><strong>Refresh this page</strong></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let marathiVoice = null;
+        let hindiVoice = null;
+
+        function listVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            const voiceList = document.getElementById('voiceList');
+            const voiceCount = document.getElementById('voiceCount');
+            
+            voiceList.innerHTML = '';
+            
+            if (voices.length === 0) {
+                voiceCount.innerHTML = '<span class="error">❌ No voices found. Please wait a moment and try again.</span>';
+                return;
+            }
+
+            // Count by language
+            const marathiVoices = voices.filter(v => v.lang.startsWith('mr'));
+            const hindiVoices = voices.filter(v => v.lang.startsWith('hi'));
+            const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+
+            voiceCount.innerHTML = `
+                <div class="success">
+                    ✅ Total voices: ${voices.length}<br>
+                    🇮🇳 Marathi voices: ${marathiVoices.length}<br>
+                    🇮🇳 Hindi voices: ${hindiVoices.length}<br>
+                    🇺🇸 English voices: ${englishVoices.length}
+                </div>
+            `;
+
+            // Display Marathi voices
+            if (marathiVoices.length > 0) {
+                const marathiHeader = document.createElement('h3');
+                marathiHeader.textContent = '🇮🇳 Marathi Voices (मराठी)';
+                marathiHeader.style.color = '#ff6b6b';
+                voiceList.appendChild(marathiHeader);
+
+                marathiVoices.forEach(voice => {
+                    const div = document.createElement('div');
+                    div.className = 'voice-item marathi';
+                    div.innerHTML = `
+                        <strong>${voice.name}</strong><br>
+                        Language: ${voice.lang}<br>
+                        Local: ${voice.localService ? 'Yes' : 'No'}
+                    `;
+                    voiceList.appendChild(div);
+                });
+
+                marathiVoice = marathiVoices[0]; // Set first Marathi voice
+            } else {
+                const noMarathi = document.createElement('div');
+                noMarathi.className = 'voice-item marathi';
+                noMarathi.innerHTML = '<strong>❌ No Marathi voices found!</strong><br>Please install Marathi language pack (see Step 4 below)';
+                voiceList.appendChild(noMarathi);
+            }
+
+            // Display Hindi voices
+            if (hindiVoices.length > 0) {
+                const hindiHeader = document.createElement('h3');
+                hindiHeader.textContent = '🇮🇳 Hindi Voices (हिंदी)';
+                hindiHeader.style.color = '#ffa502';
+                voiceList.appendChild(hindiHeader);
+
+                hindiVoices.forEach(voice => {
+                    const div = document.createElement('div');
+                    div.className = 'voice-item hindi';
+                    div.innerHTML = `
+                        <strong>${voice.name}</strong><br>
+                        Language: ${voice.lang}<br>
+                        Local: ${voice.localService ? 'Yes' : 'No'}
+                    `;
+                    voiceList.appendChild(div);
+                });
+
+                hindiVoice = hindiVoices[0]; // Set first Hindi voice
+            }
+
+            // Display some English voices
+            if (englishVoices.length > 0) {
+                const englishHeader = document.createElement('h3');
+                englishHeader.textContent = '🇺🇸 English Voices (Sample)';
+                englishHeader.style.color = '#48dbfb';
+                voiceList.appendChild(englishHeader);
+
+                englishVoices.slice(0, 3).forEach(voice => {
+                    const div = document.createElement('div');
+                    div.className = 'voice-item';
+                    div.innerHTML = `
+                        <strong>${voice.name}</strong><br>
+                        Language: ${voice.lang}
+                    `;
+                    voiceList.appendChild(div);
+                });
+            }
+        }
+
+        function testMarathiVoice() {
+            const text = document.getElementById('marathiText').value;
+            const status = document.getElementById('marathiStatus');
+
+            if (!marathiVoice) {
+                const voices = window.speechSynthesis.getVoices();
+                marathiVoice = voices.find(v => v.lang.startsWith('mr'));
+            }
+
+            if (!marathiVoice) {
+                status.innerHTML = '<span class="error">❌ No Marathi voice available. Please install Marathi language pack.</span>';
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = marathiVoice;
+            utterance.lang = 'mr-IN';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+
+            utterance.onstart = () => {
+                status.innerHTML = `<span class="success">✅ Speaking in Marathi using: ${marathiVoice.name}</span>`;
+            };
+
+            utterance.onend = () => {
+                status.innerHTML = `<span class="success">✅ Finished speaking in Marathi</span>`;
+            };
+
+            utterance.onerror = (e) => {
+                status.innerHTML = `<span class="error">❌ Error: ${e.error}</span>`;
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function testHindiVoice() {
+            const text = document.getElementById('hindiText').value;
+            const status = document.getElementById('hindiStatus');
+
+            if (!hindiVoice) {
+                const voices = window.speechSynthesis.getVoices();
+                hindiVoice = voices.find(v => v.lang.startsWith('hi'));
+            }
+
+            if (!hindiVoice) {
+                status.innerHTML = '<span class="error">❌ No Hindi voice available.</span>';
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = hindiVoice;
+            utterance.lang = 'hi-IN';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+
+            utterance.onstart = () => {
+                status.innerHTML = `<span class="success">✅ Speaking in Hindi using: ${hindiVoice.name}</span>`;
+            };
+
+            utterance.onend = () => {
+                status.innerHTML = `<span class="success">✅ Finished speaking in Hindi</span>`;
+            };
+
+            utterance.onerror = (e) => {
+                status.innerHTML = `<span class="error">❌ Error: ${e.error}</span>`;
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function stopSpeech() {
+            window.speechSynthesis.cancel();
+            document.getElementById('marathiStatus').innerHTML = '<span>⏹️ Stopped</span>';
+            document.getElementById('hindiStatus').innerHTML = '<span>⏹️ Stopped</span>';
+        }
+
+        // Load voices when page loads
+        window.speechSynthesis.onvoiceschanged = listVoices;
+        
+        // Try loading immediately
+        setTimeout(listVoices, 100);
+    </script>
+</body>
+</html>

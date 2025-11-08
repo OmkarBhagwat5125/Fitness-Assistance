@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health & Fitness AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>💪 FITNESS AI COACH</h1>
+                <p class="subtitle">Your Personal AI Trainer • Voice Enabled • 24/7 Support</p>
+            </div>
+            <div class="controls">
+                <button id="languageSelector" class="language-selector" title="Select Speech Language">
+                    <span class="lang-icon">🌐</span>
+                    <span class="lang-label" id="currentLang">English</span>
+                </button>
+                <button id="voiceSelector" class="voice-selector" title="Select Voice">
+                    <span class="voice-icon">🎙️</span>
+                    <span class="voice-label">Voice</span>
+                </button>
+                <button id="voiceToggle" class="voice-toggle" title="Toggle Voice Mode">
+                    <span class="voice-icon">🔊</span>
+                    <span class="voice-status">ON</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Language Selector Modal -->
+        <div id="languageModal" class="voice-modal hidden">
+            <div class="voice-modal-content">
+                <h3>🌐 Select Speech Recognition Language</h3>
+                <p class="modal-hint">Choose the language you'll speak in</p>
+                <div class="language-list">
+                    <div class="language-option selected" data-lang="en-US">
+                        <span class="lang-flag">🇺🇸</span>
+                        <span class="lang-name">English (US)</span>
+                    </div>
+                    <div class="language-option" data-lang="en-IN">
+                        <span class="lang-flag">🇮🇳</span>
+                        <span class="lang-name">English (India)</span>
+                    </div>
+                    <div class="language-option" data-lang="hi-IN">
+                        <span class="lang-flag">🇮🇳</span>
+                        <span class="lang-name">Hindi (हिंदी)</span>
+                    </div>
+                    <div class="language-option" data-lang="mr-IN">
+                        <span class="lang-flag">🇮🇳</span>
+                        <span class="lang-name">Marathi (मराठी)</span>
+                    </div>
+                </div>
+                <div class="modal-note">
+                    <p>ℹ️ <strong>Note:</strong> Marathi speech recognition works best in <strong>Google Chrome</strong> with internet connection.</p>
+                    <p>If Marathi doesn't work, try:</p>
+                    <ul>
+                        <li>Use Chrome browser</li>
+                        <li>Check internet connection</li>
+                        <li>Speak clearly and slowly</li>
+                        <li>Allow microphone permissions</li>
+                    </ul>
+                </div>
+                <button id="closeLangModal" class="close-modal">Close</button>
+            </div>
+        </div>
+
+        <!-- Voice Selector Modal -->
+        <div id="voiceModal" class="voice-modal hidden">
+            <div class="voice-modal-content">
+                <h3>🎙️ Select Voice</h3>
+                <div id="voiceList" class="voice-list">
+                    <!-- Voices will be populated here -->
+                </div>
+                <button id="closeModal" class="close-modal">Close</button>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome-message">
+                <div class="assistant-avatar">💪</div>
+                <div class="message-content">
+                    <p><strong>Hello! Welcome to your Personal Fitness AI Coach.</strong></p>
+                    <p>I'm here to help you achieve your health and fitness goals. Please feel free to ask me anything about exercise, nutrition, wellness, or healthy living.</p>
+                    <p class="hint">💡 <strong>Try asking:</strong> "What are the benefits of exercise?" or "How much water should I drink?"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <button id="micButton" class="mic-button" title="Click to speak">
+                <span class="mic-icon">🎤</span>
+            </button>
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="message-input" 
+                placeholder="Type your question or click the mic to speak..."
+                autocomplete="off"
+            >
+            <button id="sendButton" class="send-button" title="Send message">
+                <span class="send-icon">📤</span>
+            </button>
+        </div>
+
+        <!-- Status Indicator -->
+        <div id="statusIndicator" class="status-indicator"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
