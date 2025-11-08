@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Available Voices</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .voice-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .voice-name {
+            font-weight: bold;
+            color: #2196F3;
+            font-size: 16px;
+        }
+        .voice-lang {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .voice-details {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .language-group {
+            margin: 30px 0;
+        }
+        .language-header {
+            background: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .no-voices {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .install-guide {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎙️ Available Voices on Your System</h1>
+    <p>This page shows all text-to-speech voices installed on your computer.</p>
+    
+    <button onclick="loadVoices()">🔄 Refresh Voice List</button>
+    <button onclick="testAllVoices()">🔊 Test All Voices</button>
+    
+    <div id="voiceList"></div>
+    
+    <script>
+        function loadVoices() {
+            const voices = speechSynthesis.getVoices();
+            const voiceList = document.getElementById('voiceList');
+            
+            if (voices.length === 0) {
+                voiceList.innerHTML = '<div class="no-voices">⚠️ No voices loaded yet. Click "Refresh Voice List" button.</div>';
+                return;
+            }
+            
+            // Group voices by language
+            const groups = {
+                'English': voices.filter(v => v.lang.startsWith('en')),
+                'Hindi (हिंदी)': voices.filter(v => v.lang.startsWith('hi')),
+                'Marathi (मराठी)': voices.filter(v => v.lang.startsWith('mr')),
+                'Other Languages': voices.filter(v => !v.lang.startsWith('en') && !v.lang.startsWith('hi') && !v.lang.startsWith('mr'))
+            };
+            
+            let html = '';
+            
+            Object.entries(groups).forEach(([groupName, groupVoices]) => {
+                if (groupVoices.length > 0) {
+                    html += `<div class="language-group">`;
+                    html += `<div class="language-header">${groupName} (${groupVoices.length} voices)</div>`;
+                    
+                    groupVoices.forEach(voice => {
+                        html += `
+                            <div class="voice-item">
+                                <div class="voice-name">🎤 ${voice.name}</div>
+                                <div class="voice-lang">Language: ${voice.lang}</div>
+                                <div class="voice-details">
+                                    Local: ${voice.localService ? 'Yes ✅' : 'No ❌'} | 
+                                    Default: ${voice.default ? 'Yes ✅' : 'No ❌'}
+                                </div>
+                                <button onclick="testVoice('${voice.name}', '${voice.lang}')">Test This Voice</button>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+            });
+            
+            // Check for missing languages
+            if (groups['Hindi (हिंदी)'].length === 0) {
+                html += `
+                    <div class="install-guide">
+                        <h3>❌ Hindi Voices Not Found</h3>
+                        <p><strong>To install Hindi voices on Windows:</strong></p>
+                        <ol>
+                            <li>Press <strong>Win + I</strong> to open Settings</li>
+                            <li>Go to <strong>Time & Language</strong> → <strong>Speech</strong></li>
+                            <li>Click <strong>Add voices</strong></li>
+                            <li>Search for <strong>Hindi (India)</strong></li>
+                            <li>Click <strong>Add</strong> and wait for download</li>
+                            <li>Refresh this page</li>
+                        </ol>
+                    </div>
+                `;
+            }
+            
+            if (groups['Marathi (मराठी)'].length === 0) {
+                html += `
+                    <div class="install-guide">
+                        <h3>❌ Marathi Voices Not Found</h3>
+                        <p><strong>To install Marathi voices on Windows:</strong></p>
+                        <ol>
+                            <li>Press <strong>Win + I</strong> to open Settings</li>
+                            <li>Go to <strong>Time & Language</strong> → <strong>Speech</strong></li>
+                            <li>Click <strong>Add voices</strong></li>
+                            <li>Search for <strong>Marathi (India)</strong></li>
+                            <li>Click <strong>Add</strong> and wait for download</li>
+                            <li>Refresh this page</li>
+                        </ol>
+                        <p><strong>Note:</strong> Marathi voices may not be available in all regions. If you don't see it in Windows Settings, you may need to:</p>
+                        <ul>
+                            <li>Add Marathi as a language pack first</li>
+                            <li>Use Google Chrome with online TTS services</li>
+                            <li>Install third-party TTS software</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div class="install-guide">
+                    <h3>📊 Summary</h3>
+                    <p><strong>Total voices found:</strong> ${voices.length}</p>
+                    <p><strong>English:</strong> ${groups['English'].length} voices ✅</p>
+                    <p><strong>Hindi:</strong> ${groups['Hindi (हिंदी)'].length} voices ${groups['Hindi (हिंदी)'].length > 0 ? '✅' : '❌'}</p>
+                    <p><strong>Marathi:</strong> ${groups['Marathi (मराठी)'].length} voices ${groups['Marathi (मराठी)'].length > 0 ? '✅' : '❌'}</p>
+                    <p><strong>Other:</strong> ${groups['Other Languages'].length} voices</p>
+                </div>
+            `;
+            
+            voiceList.innerHTML = html;
+        }
+        
+        function testVoice(voiceName, lang) {
+            const voices = speechSynthesis.getVoices();
+            const voice = voices.find(v => v.name === voiceName);
+            
+            if (!voice) {
+                alert('Voice not found!');
+                return;
+            }
+            
+            let text = "Hello! This is a test.";
+            if (lang.startsWith('hi')) {
+                text = "नमस्ते! मैं आपका फिटनेस सहायक हूं।";
+            } else if (lang.startsWith('mr')) {
+                text = "नमस्कार! मी तुमचा फिटनेस सहाय्यक आहे।";
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = voice;
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+        }
+        
+        function testAllVoices() {
+            const voices = speechSynthesis.getVoices();
+            let index = 0;
+            
+            function speakNext() {
+                if (index >= voices.length) return;
+                
+                const voice = voices[index];
+                const utterance = new SpeechSynthesisUtterance(`Voice ${index + 1}: ${voice.name}`);
+                utterance.voice = voice;
+                utterance.rate = 1.2;
+                
+                utterance.onend = () => {
+                    index++;
+                    setTimeout(speakNext, 500);
+                };
+                
+                speechSynthesis.speak(utterance);
+            }
+            
+            speechSynthesis.cancel();
+            speakNext();
+        }
+        
+        // Load voices when page loads
+        window.addEventListener('load', () => {
+            // Chrome loads voices asynchronously
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            
+            // Try loading immediately
+            setTimeout(loadVoices, 100);
+        });
+    </script>
+</body>
+</html>
