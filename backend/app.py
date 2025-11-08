@@ -9,7 +9,12 @@ from supabase import create_client, Client
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+# Configure CORS to allow GitHub Pages and localhost
+CORS(app, origins=[
+    "https://*.github.io",  # Allow all GitHub Pages
+    "http://localhost:*",   # Allow local development
+    "http://127.0.0.1:*"    # Allow local development
+])
 
 # Configuration
 DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')
