@@ -189,14 +189,17 @@ def voice():
     except Exception as e:
         print(f"Error in voice endpoint: {e}")
         return jsonify({"error": "Internal server error"}), 500
-
 if __name__ == '__main__':
     # Check if environment variables are set
     if not all([DEEPSEEK_API_KEY, SUPABASE_URL, SUPABASE_KEY]):
         print("ERROR: Missing required environment variables!")
-        print("Please set DEEPSEEK_API_KEY, SUPABASE_URL, and SUPABASE_KEY in .env file")
+        print("Please set DEEPSEEK_API_KEY, SUPABASE_URL, and SUPABASE_KEY")
         exit(1)
     
     print("🚀 Starting Health & Fitness AI Assistant...")
     print("📍 Server running on http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    
+    # Use PORT from environment (for Render) or default to 5000
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
